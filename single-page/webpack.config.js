@@ -1,84 +1,56 @@
-const webpack = require('webpack');
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const path = require('path')
+const webpack = require('webpack')
+// const ExtractTextPlugin = require("extract-text-webpack-plugin")
+const HtmlWebpackPlugin = require("html-webpack-plugin")
+// const CleanWebpackPlugin = require('clean-webpack-plugin')
 // 如果用dev-server.js，entry 里要多加上 'webpack-hot-middleware/client'，此举是与 server 创建连接。
-// app: ['webpack-hot-middleware/client','./src/main.js']
+/*
+         webpack-dev-server环境下，path、publicPath、--content-base 区别与联系
+         path：指定编译目录而已（/build/js/），不能用于html中的js引用。
+         publicPath：虚拟目录，自动指向path编译目录（/assets/ => /build/js/）。html中引用js文件时，必须引用此虚拟路径（但实际上引用的是内存中的文件，既不是/build/js/也不是/assets/）。
+         --content-base：必须指向应用根目录（即index.html所在目录），与上面两个配置项毫无关联。
+         ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+        发布至生产环境：
+         1.webpack进行编译（当然是编译到/build/js/）
+         2.把编译目录（/build/js/）下的文件，全部复制到/assets/目录下（注意：不是去修改index.html中引用bundle.js的路径）
+     */
 module.exports = {
     entry: {
-        vendor: ['babel-polyfill','./src/lib/autosize.js'],
-        main : './src/main.js'
+        vendor: ['babel-polyfill', './src/lib/autosize.js'],
+        app: './src/main.js'
     },
     output: {
-        path: path.resolve(__dirname, './dist'),//输出目录
-        publicPath: '', //静态资源的 路径  用于设置cnd等信息
+        path: path.resolve(__dirname, 'dist'),
         filename: 'js/[name].js',
-        // chunkFilename: "js/[id].js"
-    },
-    devtool: 'inline-source-map',//如果将三个源文件（a.js, b.js 和 c.js）打包到一个 bundle（bundle.js）中，而其中一个源文件包含一个错误，那么堆栈跟踪就会简单地指向到 bundle.js。为了追踪错误和警告，JavaScript 提供了 source map 功能，将编译后的代码映射回原始源代码。如果一个错误来自于 b.js，source map 就会明确的告诉你
-    devServer: {
-        contentBase: path.join(__dirname, "./dist"),
-        // hot: true,
-        open: true,
-        inline: true,// 实时刷新
-        historyApiFallback: true, //对于单页面程序，浏览器的brower histroy可以设置成html5 history api或者hash，而设置为html5 api的，如果刷新浏览器会出现404 not found，原因是它通过这个路径（比如： /activities/api/ques/2）来访问后台，所以会出现404，而把historyApiFallback设置为true那么所有的路径都执行index.html。
-        stats: {
-            colors: true
-        }
+        publicPath: '/'
     },
     resolve: {
-        extensions: ['*', '.js', '.vue'],  //不需要手动添加的文件扩展名
+        extensions: ['.js', '.vue', '.json'],//不需要手动添加的文件扩展名
         alias: {
-            'TEST': path.resolve(__dirname,'./src/js/test.js') //别名  方便后续引入
+            'TEST': path.resolve(__dirname, './src/js/test.js') //别名  方便后续引入
+        }
+    },
+    devtool: 'cheap-module-eval-source-map',//original source (lines only)
+    devServer: {
+        historyApiFallback: true,//对于单页面程序，浏览器的brower histroy可以设置成html5 history api或者hash，而设置为html5 api的，如果刷新浏览器会出现404 not found，原因是它通过这个路径（比如： /activities/api/ques/2）来访问后台，所以会出现404，而把historyApiFallback设置为true那么所有的路径都执行index.html。
+        hot: true,
+        contentBase: './', // 必须指向应用根目录（即index.html所在目录），与上面两个配置项毫无关联。
+        compress: true,
+        host: 'localhost',
+        port: '3005',
+        open: true,
+        publicPath: '/',
+        // proxy: {},
+        // quiet: true, // necessary for FriendlyErrorsPlugin
+        stats: {
+            colors: true
         }
     },
     module: {
         rules: [
             {
                 test: /\.vue$/,
-                loader: 'vue-loader',
-                options: {
-                    loaders: {
-                        // Since sass-loader (weirdly) has SCSS as its default parse mode, we map
-                        // the "scss" and "sass" values for the lang attribute to the right configs here.
-                        // other preprocessors should work out of the box, no loader config like this necessary.
-                        scss :
-                        [
-                        'vue-style-loader',
-                        'css-loader',
-                        'postcss-loader',
-                        'sass-loader'
-                        ],
-                            // ExtractTextPlugin.extract({
-                            //     use: ['css-loader','postcss-loader','sass-loader'],
-                            //     fallback: 'vue-style-loader'
-                            // }),
-                        sass :
-                        [
-                        'vue-style-loader',
-                        'css-loader',
-                        'postcss-loader',
-                        'sass-loader?indentedSyntax'
-                        ],
-                            // ExtractTextPlugin.extract({
-                            //     use: ['css-loader','postcss-loader','sass-loader?indentedSyntax'],
-                            //     fallback: 'vue-style-loader'
-                            // }),
-                        //可以这里配置css 也可以配置 下面的  extractCSS: true
-                        css :
-                        [
-                        'vue-style-loader',
-                        'css-loader',
-                        'postcss-loader'
-                        ]
-                            // ExtractTextPlugin.extract({
-                            //     use: 'css-loader',
-                            //     fallback: 'vue-style-loader'
-                            // })
-                    },
-                    extractCSS: true,
-                    // other vue-loader options go here
-                }
+                loader: 'vue-loader'
             },
             //js 文件  使用babel-loader 目的是 支持es6 语法
             {
@@ -109,7 +81,7 @@ module.exports = {
                *  图片大小小于10kb 采用内联的形式，否则输出图片
                * */
             {
-                test: /\.(png|jpe?g|gif|svg)$/,
+                test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
                 use: [
                     {
                         loader: 'url-loader',
@@ -124,14 +96,13 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            title: 'single webpack',//用于生成的HTML文件的标题
+            title: 'single',//用于生成的HTML文件的标题
             template: 'index.html',//模板的路径。支持加载器，例如 html!./index.html。
             filename: 'index.html',//用于生成的HTML文件的名称，默认是index.html。你可以在这里指定子目录（例如:assets/admin.html）
         }),
-        // new CleanWebpackPlugin(['dist']),//清除生成编译后的文件。  相当于rm -rf dist
-        //启用 HMR 要增加下面两个插件
-        // new webpack.NamedModulesPlugin(),
-        // new webpack.HotModuleReplacementPlugin()
-        // new webpack.NoEmitOnErrorsPlugin()   //出错时只打印错误，但不重新加载页面
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
+        new webpack.NoEmitOnErrorsPlugin(),
+
     ]
-};
+}

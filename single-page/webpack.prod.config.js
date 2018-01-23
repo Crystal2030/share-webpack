@@ -1,6 +1,8 @@
 const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 // 如果用dev-server.js，entry 里要多加上 'webpack-hot-middleware/client'，此举是与 server 创建连接。
 // app: ['webpack-hot-middleware/client','./src/main.js']
@@ -44,18 +46,17 @@ module.exports = {
             },
             {
                 test: /\.css/,
-                use: [
-                    'style-loader',
-                    'css-loader',
-                ]
+                use: ExtractTextPlugin.extract({
+                    fallback: "style-loader",
+                    use: ['css-loader','postcss-loader']
+                })
             },
             {
                 test: /\.scss$/,
-                use: [
-                    'style-loader',
-                    'css-loader',
-                    'sass-loader'
-                ]
+                use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: ['css-loader','postcss-loader', 'sass-loader']
+                })
             },
             //图片配置
             /*
@@ -77,6 +78,7 @@ module.exports = {
         ]
     },
     plugins: [
+        new ExtractTextPlugin("css/[name]-[contenthash].css"), //css hash   和  chunkhash 、contenthash
         new HtmlWebpackPlugin({
             title: 'single',//用于生成的HTML文件的标题
             template: 'index.html',//模板的路径。支持加载器，例如 html!./index.html。
@@ -86,11 +88,21 @@ module.exports = {
                 removeComments: true,
                 collapseWhitespace: true
             },
+            // necessary to consistently work with multiple chunks via CommonsChunkPlugin
+            chunksSortMode: 'dependency'
         }),
         new CleanWebpackPlugin(['dist']),//清除生成编译后的文件。  相当于rm -rf dist
-        //启用 HMR 要增加下面两个插件
-        new webpack.NamedModulesPlugin(),
-        new webpack.HotModuleReplacementPlugin()
-        // new webpack.NoEmitOnErrorsPlugin()   //出错时只打印错误，但不重新加载页面
+        //代码压缩
+        new webpack.optimize.UglifyJsPlugin({
+            sourceMap: true,
+            compress: {
+                warnings: false
+            }
+        }),
+        // Compress extracted CSS. We are using this plugin so that possible
+        // duplicated CSS from different components can be deduped.
+        new OptimizeCSSPlugin({
+            cssProcessorOptions: { safe: true, map: { inline: false }}
+        }),
     ]
 };

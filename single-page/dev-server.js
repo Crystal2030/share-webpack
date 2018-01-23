@@ -8,12 +8,12 @@ const webpackConfig = require('./webpack.config');
 
 const port = 3005;
 const app = express();
-
 const compiler = webpack(webpackConfig);
 //complier = webpack(webpackConfig)会创建一个用来传给webpack-middle-ware的对象，同时我们还可以给他webpack-middle-ware传一些option,比较重要的是这个publicPath, 这个是必传的参数，通常是和你的webpack.config.js里的publicPath是一致的，然后通过
 let devMiddleware = require('webpack-dev-middleware')(compiler, {
     publicPath: webpackConfig.output.publicPath,
     // noInfo: true,
+    inline: true,
     hot: true,
     // quiet : true,,//启用 quiet 后，除了初始启动信息之外的任何内容都不会被打印到控制台。这也意味着来自 webpack 的错误或警告在控制台不可见。
     stats: {
