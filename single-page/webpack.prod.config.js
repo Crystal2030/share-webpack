@@ -5,11 +5,49 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 // 如果用dev-server.js，entry 里要多加上 'webpack-hot-middleware/client'，此举是与 server 创建连接。
-// app: ['webpack-hot-middleware/client','./src/main.js']
+const vueLoaderConfig = {
+    loaders: {
+        scss:
+            ExtractTextPlugin.extract({
+                use: ['css-loader', 'postcss-loader', 'sass-loader'],
+                fallback: 'vue-style-loader'
+            }),
+        /*[
+        'vue-style-loader',
+        'css-loader',
+        'postcss-loader',
+        'sass-loader'
+        ],*/
+
+        sass:
+            ExtractTextPlugin.extract({
+                use: ['css-loader', 'postcss-loader', 'sass-loader?indentedSyntax'],
+                fallback: 'vue-style-loader'
+            }),
+        /*[
+        'vue-style-loader',
+        'css-loader',
+        'postcss-loader',
+        'sass-loader?indentedSyntax'
+        ],*/
+
+        css:
+            ExtractTextPlugin.extract({
+                use: 'css-loader',
+                fallback: 'vue-style-loader'
+            }),
+        /*[
+        'vue-style-loader',
+        'css-loader',
+        'postcss-loader'
+        ]*/
+    },
+    extractCSS: true
+};
 module.exports = {
     entry: {
-        vendor: ['babel-polyfill','./src/lib/autosize.js'],
-        main : './src/main.js'
+        vendor: ['babel-polyfill', './src/lib/autosize.js'],
+        main: './src/main.js'
     },
     output: {
         path: path.resolve(__dirname, 'dist'),//输出目录
@@ -29,14 +67,15 @@ module.exports = {
     resolve: {
         extensions: ['*', '.js', '.vue'],  //不需要手动添加的文件扩展名
         alias: {
-            'TEST': path.resolve(__dirname,'./src/js/test.js') //别名  方便后续引入
+            'TEST': path.resolve(__dirname, './src/js/test.js') //别名  方便后续引入
         }
     },
     module: {
         rules: [
             {
                 test: /\.vue$/,
-                loader: 'vue-loader'
+                loader: 'vue-loader',
+                options: vueLoaderConfig
             },
             //js 文件  使用babel-loader 目的是 支持es6 语法
             {
@@ -48,14 +87,14 @@ module.exports = {
                 test: /\.css/,
                 use: ExtractTextPlugin.extract({
                     fallback: "style-loader",
-                    use: ['css-loader','postcss-loader']
+                    use: ['css-loader', 'postcss-loader']
                 })
             },
             {
                 test: /\.scss$/,
                 use: ExtractTextPlugin.extract({
                     fallback: 'style-loader',
-                    use: ['css-loader','postcss-loader', 'sass-loader']
+                    use: ['css-loader', 'postcss-loader', 'sass-loader']
                 })
             },
             //图片配置
@@ -78,7 +117,9 @@ module.exports = {
         ]
     },
     plugins: [
-        new ExtractTextPlugin("css/[name]-[contenthash].css"), //css hash   和  chunkhash 、contenthash
+        new ExtractTextPlugin({
+            filename: "css/[name].[contenthash].css"
+        }), //css hash   和  chunkhash 、contenthash
         new HtmlWebpackPlugin({
             title: 'single',//用于生成的HTML文件的标题
             template: 'index.html',//模板的路径。支持加载器，例如 html!./index.html。
@@ -102,7 +143,7 @@ module.exports = {
         // Compress extracted CSS. We are using this plugin so that possible
         // duplicated CSS from different components can be deduped.
         new OptimizeCSSPlugin({
-            cssProcessorOptions: { safe: true, map: { inline: false }}
+            cssProcessorOptions: {safe: true, map: {inline: false}}
         }),
     ]
 };

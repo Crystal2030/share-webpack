@@ -1,7 +1,32 @@
 const path = require('path')
 const webpack = require('webpack')
-// const ExtractTextPlugin = require("extract-text-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
+const vueLoaderConfig = {
+    loaders: {
+        scss:
+            [
+                'vue-style-loader',
+                'css-loader',
+                'postcss-loader',
+                'sass-loader'
+            ],
+        sass:
+            [
+                'vue-style-loader',
+                'css-loader',
+                'postcss-loader',
+                'sass-loader?indentedSyntax'
+            ],
+        css:
+            [
+                'vue-style-loader',
+                'css-loader',
+                'postcss-loader',
+                'sass-loader?indentedSyntax'
+            ]
+    },
+    extractCSS: true
+};
 // const CleanWebpackPlugin = require('clean-webpack-plugin')
 // 如果用dev-server.js，entry 里要多加上 'webpack-hot-middleware/client'，此举是与 server 创建连接。
 /*
@@ -50,7 +75,8 @@ module.exports = {
         rules: [
             {
                 test: /\.vue$/,
-                loader: 'vue-loader'
+                loader: 'vue-loader',
+                options: vueLoaderConfig
             },
             //js 文件  使用babel-loader 目的是 支持es6 语法
             {
