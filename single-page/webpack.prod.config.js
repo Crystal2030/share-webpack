@@ -3,8 +3,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-// 如果用dev-server.js，entry 里要多加上 'webpack-hot-middleware/client'，此举是与 server 创建连接。
+const CleanWebpackPlugin = require('clean-webpack-plugin'); //主要用于 打包之前 先清空 打包目录下的文件，防止文件混乱。
 const vueLoaderConfig = {
     loaders: {
         scss:

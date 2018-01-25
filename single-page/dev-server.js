@@ -8,6 +8,15 @@ const webpackConfig = require('./webpack.config');
 
 const port = 3005;
 const app = express();
+
+//如果用dev-server.js，entry 里要多加上 'webpack-hot-middleware/client'，此举是与 server 创建连接。
+Object.getOwnPropertyNames((webpackConfig.entry || {})).map(function(name){
+    webpackConfig.entry[name] = []
+        .concat("webpack-hot-middleware/client?reload=true")
+        .concat(webpackConfig.entry[name])
+});
+console.log('-----', JSON.stringify(webpackConfig.entry))
+
 const compiler = webpack(webpackConfig);
 //complier = webpack(webpackConfig)会创建一个用来传给webpack-middle-ware的对象，同时我们还可以给他webpack-middle-ware传一些option,比较重要的是这个publicPath, 这个是必传的参数，通常是和你的webpack.config.js里的publicPath是一致的，然后通过
 let devMiddleware = require('webpack-dev-middleware')(compiler, {
