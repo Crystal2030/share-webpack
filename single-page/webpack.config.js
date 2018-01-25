@@ -27,7 +27,6 @@ const vueLoaderConfig = {
     },
     extractCSS: true
 };
-// const CleanWebpackPlugin = require('clean-webpack-plugin')
 // 如果用dev-server.js，entry 里要多加上 'webpack-hot-middleware/client'，此举是与 server 创建连接。
 /*
          webpack-dev-server环境下，path、publicPath、--content-base 区别与联系
@@ -47,7 +46,8 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'js/[name].js',
-        publicPath: '/'
+        publicPath: '/',
+        chunkFilename: 'js/chunk/[name].js'
     },
     resolve: {
         extensions: ['.js', '.vue', '.json'],//不需要手动添加的文件扩展名
