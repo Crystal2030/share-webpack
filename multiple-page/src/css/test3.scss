@@ -1,0 +1,14 @@
+@import "reset";
+@import "px2rem";
+.test3{
+	width: 40%;
+	height: px2rem(200);
+	background : #28a4a5;
+	color : #fff;
+	text-align: center;
+	line-height: px2rem(200);
+	position: absolute;
+	top:50%;
+	left : 50%;
+	transform: translate(-50%,-50%);
+}
