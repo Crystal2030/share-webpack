@@ -1,6 +1,6 @@
-const path = require('path')
-const webpack = require('webpack')
-const HtmlWebpackPlugin = require("html-webpack-plugin")
+const path = require('path');
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 const vueLoaderConfig = {
     loaders: {
         scss:
@@ -142,7 +142,7 @@ module.exports = {
         }),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
-        new webpack.NoEmitOnErrorsPlugin(),
+        new webpack.NoEmitOnErrorsPlugin(),// 跳过编译时出错的代码并记录，使编译后运行时的包不会发生错误。
 
     ]
-}
+};
